@@ -1,0 +1,3 @@
+selenium 
+PyPDF
+reportlab
