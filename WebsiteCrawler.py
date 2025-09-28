@@ -14,13 +14,14 @@ import shutil
 
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException
 import PyPDF2
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import A4
 
 
 class WebsitePDFCrawler:
@@ -51,7 +52,7 @@ class WebsitePDFCrawler:
         geckodriver_path = self.get_geckodriver_path()
         
         try:
-            service = webdriver.FirefoxService(executable_path=geckodriver_path)
+            service = FirefoxService(executable_path=geckodriver_path)
             self.driver = webdriver.Firefox(service=service, options=options)
             self.driver.set_window_size(1200, 800)
             print("✓ Firefox driver initialized successfully")
@@ -84,59 +85,102 @@ class WebsitePDFCrawler:
     
     def get_page_links(self, current_url):
         """Extract all links from the current page"""
-        links = set()
+        links = []
         try:
-            # Wait for page to load
-            WebDriverWait(self.driver, 10).until(
+            # Wait for page to load (increased timeout)
+            WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located((By.TAG_NAME, "body"))
             )
-            
+        
             # Find all anchor tags
             anchor_elements = self.driver.find_elements(By.TAG_NAME, "a")
-            
+        
             for anchor in anchor_elements:
                 href = anchor.get_attribute("href")
                 if href:
                     full_url = urljoin(current_url, href)
+                    # Clean URL - remove fragments and normalize
+                    full_url = full_url.split('#')[0].rstrip('/')
+                
                     # Only include HTTP/HTTPS links from same domain
-                    if (full_url.startswith(('http://', 'https://')) and 
+                    if (full_url.startswith(('http://', 'https://')) and
                         self.is_same_domain(full_url) and
-                        full_url not in self.visited_urls):
-                        links.add(full_url)
-        
+                        full_url not in self.visited_urls and
+                        full_url not in links and
+                        not self._should_skip_url(full_url)):
+                        links.append(full_url)
+    
         except Exception as e:
             print(f"Warning: Error extracting links from {current_url}: {e}")
-        
+    
         return links
+
+    def _should_skip_url(self, url):
+        """Skip URLs that typically cause issues"""
+        skip_patterns = [
+            '.pdf', '.doc', '.zip', '.exe', '.jpg', '.png', '.gif',
+            'mailto:', 'tel:', 'javascript:',
+            '/search?', '/login', '/logout', '/register'
+        ]
+        return any(pattern in url.lower() for pattern in skip_patterns)
     
     def save_page_as_pdf(self, url, filename):
-        """Save current page as PDF using browser's print function"""
+        """Save current page as PDF using Firefox's print function"""
         try:
             self.driver.get(url)
             
             # Wait for page to fully load
-            time.sleep(3)
+            WebDriverWait(self.driver, 30).until(
+                EC.presence_of_element_located((By.TAG_NAME, "body"))   
+            )
+            time.sleep(5)  # Additional wait for dynamic content
             
-            # Execute print to PDF
-            pdf_data = self.driver.execute_cdp_cmd("Page.printToPDF", {
-                "format": "A4",
-                "printBackground": True,
-                "marginTop": 0.4,
-                "marginBottom": 0.4,
-                "marginLeft": 0.4,
-                "marginRight": 0.4,
-                "preferCSSPageSize": True
-            })
+            # Firefox-specific print to PDF
+            pdf_data = self.driver.print_page()
             
-            # Save PDF data
+            # Save PDF data (print_page returns base64 encoded data)
             import base64
             with open(filename, "wb") as f:
-                f.write(base64.b64decode(pdf_data['data']))
+                f.write(base64.b64decode(pdf_data))
             
             return True
             
         except Exception as e:
             print(f"Error saving {url} as PDF: {e}")
+            # Try alternative method if print_page fails
+            return self._save_page_screenshot_fallback(url, filename)
+    
+    def _save_page_screenshot_fallback(self, url, filename):
+        """Fallback method using screenshot and reportlab"""
+        try:
+            # Get page dimensions
+            total_height = self.driver.execute_script("return document.body.scrollHeight")
+            self.driver.set_window_size(1200, total_height)
+            
+            # Take screenshot
+            screenshot_path = filename.replace('.pdf', '.png')
+            self.driver.save_screenshot(screenshot_path)
+            
+            # Convert screenshot to PDF
+            from reportlab.pdfgen import canvas
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib.utils import ImageReader
+            
+            c = canvas.Canvas(filename, pagesize=A4)
+            img = ImageReader(screenshot_path)
+            
+            # Scale image to fit A4
+            page_width, page_height = A4
+            c.drawImage(img, 0, 0, width=page_width, height=page_height, preserveAspectRatio=True)
+            c.save()
+            
+            # Clean up screenshot
+            os.remove(screenshot_path)
+            
+            return True
+            
+        except Exception as e:
+            print(f"Fallback method also failed: {e}")
             return False
     
     def crawl_website(self):
