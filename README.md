@@ -1,6 +1,6 @@
 # PAGEBINDER
 
-A clean, efficient Python tool that crawls websites and converts them into a single PDF document while preserving the visual appearance and maintaining clickable links.
+A clean, efficient Python tool that crawls websites and converts them into a single PDF document with additional features (check CLI options).
 
 ## Features 
 
@@ -42,7 +42,7 @@ chmod +x drivers/geckodriver
 
 **You're ready to go!** The tool includes everything needed to run.
 
-## Usage 
+## Usage 💻
 
 ### Basic Usage
 ```bash
@@ -69,8 +69,14 @@ python website_crawler.py --help
 | `-o, --output` | Output PDF filename | `website.pdf` |
 | `-m, --max-pages` | Maximum pages to crawl | `50` |
 | `--no-headless` | Run browser in visible mode | Headless mode |
+| `-i, --index` | Generate hierarchical table of contents with clickable links | 
+| `--include` | Include only URLs matching this pattern (regex). Can be used multiple times |
+| `--exclude` | Exclude URLs matching this pattern (regex). Can be used multiple times |
+| `--max-depth` | Maximum URL depth from base URL (e.g., 2 = two levels deep) |
+| `--resume` | Resume from previous interrupted crawl |
+| `--state-file` | State file for resume functionality (default: crawler_state.json)
 
-## How It Works 
+## How It Works 🔧
 
 1. **Initialization**: Sets up Firefox WebDriver with optimized settings
 2. **Crawling**: Starting from the base URL, discovers all internal links
@@ -78,16 +84,16 @@ python website_crawler.py --help
 4. **Merging**: Combines all individual PDFs into a single document
 5. **Cleanup**: Removes temporary files and closes browser
 
-## Examples 
+## Examples 📖
 
 ### Documentation Site
 ```bash
-python website_crawler.py https://requests.readthedocs.io -o requests_docs.pdf -m 75
+python website_crawler.py https://requests.readthedocs.io -o requests_docs.pdf -m 75 --max-depth 2
 ```
 
 ### Blog or News Site
 ```bash
-python website_crawler.py https://realpython.com/blog/ -o realpython_blog.pdf -m 100
+python website_crawler.py https://realpython.com/blog/ -o realpython_blog.pdf -m 100 -i 
 ```
 
 ### Small Website (All Pages)
@@ -95,7 +101,7 @@ python website_crawler.py https://realpython.com/blog/ -o realpython_blog.pdf -m
 python website_crawler.py https://smallwebsite.com -m 1000
 ```
 
-## Output 
+## Output 📄
 
 The tool generates:
 - A single PDF file with all crawled pages
@@ -103,6 +109,8 @@ The tool generates:
 - Functional clickable links
 - Progress feedback during crawling
 - File size information upon completion
+- Hierarchical index
+- State files to save current extent of crawl - user-enabled
 
 ## Limitations ⚠️
 
@@ -122,11 +130,11 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License 
+## License 📝
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Troubleshooting 
+## Troubleshooting 🔍
 
 ### Common Issues
 
