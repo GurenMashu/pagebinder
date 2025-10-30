@@ -24,8 +24,8 @@ Before using this tool, you need:
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/yourusername/webtopdf.git
-cd webtopdf
+git clone https://github.com/GurenMashu/pagebinder.git
+cd pagebinder
 ```
 
 2. **Install Python dependencies:**
@@ -52,7 +52,7 @@ python website_crawler.py https://example.com
 ### Advanced Options
 ```bash
 # Specify output filename and maximum pages
-python website_crawler.py https://docs.python.org -o python_docs.pdf -m 100
+python website_crawler.py https://docs.python.org -o python_docs.pdf -m 100 -i 
 
 # Run in visible mode (non-headless)
 python website_crawler.py https://blog.example.com --no-headless -m 25
@@ -74,7 +74,7 @@ python website_crawler.py --help
 | `--exclude` | Exclude URLs matching this pattern (regex). Can be used multiple times |
 | `--max-depth` | Maximum URL depth from base URL (e.g., 2 = two levels deep) |
 | `--resume` | Resume from previous interrupted crawl |
-| `--state-file` | State file for resume functionality (default: crawler_state.json)
+| `--state-file` | State file for resume functionality (default: crawler_state.json) |
 
 ## How It Works 🔧
 
