@@ -42,7 +42,7 @@ chmod +x drivers/geckodriver
 
 **You're ready to go!** The tool includes everything needed to run.
 
-## Usage 💻
+## Usage 
 
 ### Basic Usage
 ```bash
@@ -84,7 +84,7 @@ python website_crawler.py --help
 4. **Merging**: Combines all individual PDFs into a single document
 5. **Cleanup**: Removes temporary files and closes browser
 
-## Examples 📖
+## Examples 
 
 ### Documentation Site
 ```bash
@@ -101,7 +101,7 @@ python website_crawler.py https://realpython.com/blog/ -o realpython_blog.pdf -m
 python website_crawler.py https://smallwebsite.com -m 1000
 ```
 
-## Output 📄
+## Output 
 
 The tool generates:
 - A single PDF file with all crawled pages
@@ -130,7 +130,7 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License 📝
+## License 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
