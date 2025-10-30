@@ -69,12 +69,12 @@ python website_crawler.py --help
 | `-o, --output` | Output PDF filename | `website.pdf` |
 | `-m, --max-pages` | Maximum pages to crawl | `50` |
 | `--no-headless` | Run browser in visible mode | Headless mode |
-| `-i, --index` | Generate hierarchical table of contents with clickable links | 
-| `--include` | Include only URLs matching this pattern (regex). Can be used multiple times |
-| `--exclude` | Exclude URLs matching this pattern (regex). Can be used multiple times |
-| `--max-depth` | Maximum URL depth from base URL (e.g., 2 = two levels deep) |
-| `--resume` | Resume from previous interrupted crawl |
-| `--state-file` | State file for resume functionality (default: crawler_state.json) |
+| `-i, --index` | Generate hierarchical table of contents with clickable links | - |
+| `--include` | Include only URLs matching this pattern (regex). Can be used multiple times | - |
+| `--exclude` | Exclude URLs matching this pattern (regex). Can be used multiple times | - |
+| `--max-depth` | Maximum URL depth from base URL (e.g., 2 = two levels deep) | - |
+| `--resume` | Resume from previous interrupted crawl | - |
+| `--state-file` | State file for resume functionality (default: crawler_state.json) | - |
 
 ## How It Works 🔧
 
